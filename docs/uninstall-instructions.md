@@ -1,16 +1,22 @@
-# XRP-Portkey — Uninstall Instructions
+# XRP-Ghostlink — Uninstall Instructions
 
-This document explains how to remove XRP-Portkey and revert the system to your preferred Wi-Fi behavior.
+This guide documents the uninstallation of XRP-Ghostlink and the procedures for reverting its network configuration, system services, and optional Tailscale components.
+
+> [!WARNING]
+> The uninstaller has not been validated against the redesigned XRP-Ghostlink configuration. It can modify network services, remove firewall rules, and optionally delete Tailscale identity data. Running it over SSH may interrupt remote connectivity.
+>
+> Do not execute this script until its behavior has been reviewed, a recovery method is available, and any important configuration or identity data is backed up.
 
 ## RUN THE UNINSTALLER
 Use the interactive script bundled with this repo:
   ```
-  sudo bash ./scripts/uninstall-portkey.sh
+  sudo bash ./scripts/uninstall-ghostlink.sh
   ```
 ## WHAT THE UNINSTALLER DOES
-- Stops & disables Portkey services:
-  - portkey-boot.service
-  - dnsmasq (only if you enabled Ethernet sharing)
+- Stops and disables Ghostlink services:
+  - ghostlink-boot.service
+  - dnsmasq
+- Stops tailscaled, even when Tailscale is not uninstalled.
 
 - Cleans up Ethernet sharing:
   - Removes NAT/iptables rules targeting tailscale0
@@ -32,14 +38,14 @@ Use the interactive script bundled with this repo:
 You can quickly confirm the system state with:
 
 **Services should be stopped/disabled**
-systemctl status portkey-boot.service
+systemctl status ghostlink-boot.service
 systemctl is-enabled dnsmasq || true
 
 **If you chose Factory mode, NetworkManager should be running:**
 systemctl is-active NetworkManager
 
 **iptables NAT to tailscale0 should be absent**
-sudo iptables -t nat -S | grep tailscale0 || echo "No Portkey NAT rules found."
+sudo iptables -t nat -S | grep tailscale0 || echo "No Ghostlink NAT rules found."
 
 > [!TIP]
 >If you switched to NetworkManager, connect to Wi-Fi with:  
@@ -50,6 +56,5 @@ sudo iptables -t nat -S | grep tailscale0 || echo "No Portkey NAT rules found."
 
 ## NOTES & RECOMMENDATIONS
 - Keep backups made by the uninstaller (e.g., wpa_supplicant-wlan0.conf.bak.<timestamp>) until you confirm everything works.
-- If you later re-install Portkey, you can use install-portkey.sh again; it will re-assert the services and NAT/DHCP.
+- If you later re-install Ghostlink, you can use install-ghostlink.sh again; it will re-assert the services and NAT/DHCP.
 - If you removed /var/lib/tailscale and re-install Tailscale, the device will appear as a new node in your tailnet.
-EOF
