@@ -1,10 +1,8 @@
-mkdir -p scripts
-cat <<'EOF' | sudo tee scripts/uninstall-portkey.sh >/dev/null
 #!/usr/bin/env bash
 set -euo pipefail
 
-# XRP-Portkey uninstaller (interactive)
-# Removes Portkey NAT/DHCP/boot pieces, optionally uninstalls Tailscale
+# XRP-Ghostlink uninstaller (interactive)
+# Removes Ghostlink NAT/DHCP/boot pieces, optionally uninstalls Tailscale
 #Optionally revert WiFi modes including switching to NetworkManager.
 #
 # SPDX-License-Identifier: MIT
@@ -22,35 +20,35 @@ confirm() {
   [[ "${ans,,}" == "y" || "${ans,,}" == "yes" ]]
 }
 
-say()  { echo -e "\033[1;36m[portkey]\033[0m $*"; }
+say()  { echo -e "\033[1;36m[ghostlink]\033[0m $*"; }
 warn() { echo -e "\033[1;33m[warn]\033[0m $*" >&2; }
 err()  { echo -e "\033[1;31m[err]\033[0m $*" >&2; }
 
 need_root
 
-say "XRP-Portkey Uninstaller"
-echo "This will remove Portkey components and optionally revert Wi-Fi behavior."
+say "XRP-Ghostlink Uninstaller"
+echo "This will remove Ghostlink components and optionally revert Wi-Fi behavior."
 
 # 1) Stop services we manage
 say "Stopping services (if present)..."
-systemctl stop portkey-boot.service 2>/dev/null || true
+systemctl stop ghostlink-boot.service 2>/dev/null || true
 systemctl stop dnsmasq               2>/dev/null || true
 systemctl stop tailscaled            2>/dev/null || true
 
-# 2) Disable Portkey services
+# 2) Disable Ghostlink services
 say "Disabling services (if present)..."
-systemctl disable portkey-boot.service 2>/dev/null || true
+systemctl disable ghostlink-boot.service 2>/dev/null || true
 systemctl disable dnsmasq             2>/dev/null || true
 # Don't disable tailscaled yet; user decides later.
 
 # 3) Remove boot consolidation unit & script
-if [[ -f /etc/systemd/system/portkey-boot.service ]]; then
-  say "Removing /etc/systemd/system/portkey-boot.service"
-  rm -f /etc/systemd/system/portkey-boot.service
+if [[ -f /etc/systemd/system/ghostlink-boot.service ]]; then
+  say "Removing /etc/systemd/system/ghostlink-boot.service"
+  rm -f /etc/systemd/system/ghostlink-boot.service
 fi
-if [[ -f /usr/local/bin/portkey-boot.sh ]]; then
-  say "Removing /usr/local/bin/portkey-boot.sh"
-  rm -f /usr/local/bin/portkey-boot.sh
+if [[ -f /usr/local/bin/ghostlink-boot.sh ]]; then
+  say "Removing /usr/local/bin/ghostlink-boot.sh"
+  rm -f /usr/local/bin/ghostlink-boot.sh
 fi
 
 # 4) Revert Ethernet sharing (dnsmasq + iptables + sysctl + eth0 IP)
@@ -82,7 +80,7 @@ if confirm "Revert Ethernet sharing (disable DHCP on eth0, remove NAT & IP forwa
   # Revert IP forwarding if set
   if grep -q '^net.ipv4.ip_forward=1' /etc/sysctl.conf 2>/dev/null; then
     say "Reverting net.ipv4.ip_forward in /etc/sysctl.conf"
-    sed -i -e 's/^net.ipv4.ip_forward=1/# net.ipv4.ip_forward=0 (disabled by portkey uninstall)/' /etc/sysctl.conf || true
+    sed -i -e 's/^net.ipv4.ip_forward=1/# net.ipv4.ip_forward=0 (disabled by ghostlink uninstall)/' /etc/sysctl.conf || true
     sysctl -p || true
   fi
 
@@ -183,5 +181,3 @@ systemctl daemon-reload
 
 say "Uninstall steps complete."
 echo "Recommended: reboot to ensure a clean state: sudo reboot"
-EOF
-sudo chmod +x scripts/uninstall-portkey.sh
