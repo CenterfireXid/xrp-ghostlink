@@ -1,6 +1,9 @@
-# XRP-Portkey — Manual Setup (No Installer)
+# XRP-Ghostlink — Manual Setup (No Installer)
 
-This is the full, linear guide to configure XRP-Portkey from a clean Raspberry Pi OS Lite image.
+This guide covers the manual configuration of XRP-Ghostlink, a portable Raspberry Pi Tailscale client that connects to configured Wi-Fi networks and routes traffic through an existing Tailscale exit node. It provides an alternative to the automated installation script.
+
+> [!WARNING]
+> This manual procedure has not been validated against the current Raspberry Pi OS networking configuration. It is retained as a reference while the Ghostlink installation process is being redesigned. Do not execute it on a deployed system yet.
 
 ## 0) Assumptions
 - Pi boots to CLI and you have sudo access
@@ -74,7 +77,7 @@ sudo systemctl restart dnsmasq
 
 ## 5) Persistence (boot re‑assert)
 ```bash
-sudo tee /usr/local/bin/portkey-boot.sh >/dev/null <<'EOS'
+sudo tee /usr/local/bin/ghostlink-boot.sh >/dev/null <<'EOS'
 #!/bin/bash
 set -e
 for i in {1..20}; do ip -4 addr show wlan0 | grep -q 'inet ' && break; sleep 2; done
@@ -84,23 +87,23 @@ ip link set eth0 up
 [ -f /etc/iptables/rules.v4 ] && iptables-restore < /etc/iptables/rules.v4
 systemctl restart dnsmasq || true
 EOS
-sudo chmod +x /usr/local/bin/portkey-boot.sh
+sudo chmod +x /usr/local/bin/ghostlink-boot.sh
 
-sudo tee /etc/systemd/system/portkey-boot.service >/dev/null <<'EOF'
+sudo tee /etc/systemd/system/ghostlink-boot.service >/dev/null <<'EOF'
 [Unit]
-Description=XRP-Portkey boot consolidation
+Description=XRP-Ghostlink boot consolidation
 After=network-online.target tailscaled.service
 Wants=network-online.target
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/portkey-boot.sh
+ExecStart=/usr/local/bin/ghostlink-boot.sh
 RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable portkey-boot.service tailscaled wpa_supplicant@wlan0 dhcpcd
+sudo systemctl enable ghostlink-boot.service tailscaled wpa_supplicant@wlan0 dhcpcd
 ```
 
 ## 6) Verify
