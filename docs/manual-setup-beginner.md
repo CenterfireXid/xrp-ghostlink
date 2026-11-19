@@ -1,11 +1,16 @@
-# XRP-Portkey — Manual Setup (Beginner-Friendly)
+# XRP-Ghostlink — Manual Setup (Beginner-Friendly)
 
-### This is a “for dummies” style walkthrough you can follow line-by-line. It explains what each command does, how to confirm it worked, and what to do if it didn’t.
+This beginner-friendly guide explains how to manually configure XRP-Ghostlink on a Raspberry Pi. Each stage includes the commands, their purpose, expected results, and basic troubleshooting guidance.
+
+XRP-Ghostlink is a portable Tailscale client designed to connect to configured Wi-Fi networks and route traffic through an existing remote exit node.
+
+> [!WARNING]
+> This guide documents the original installation procedure and has not been validated against current Raspberry Pi OS networking defaults. Do not execute these commands on a deployed device until the Ghostlink setup is redesigned and tested.
 
 ## 0) Before you start (5 min)
 
 You need:
-- A Raspberry Pi (Pi 4B recommended) running Raspberry Pi OS Lite (no desktop is fine).
+- A Raspberry Pi running Raspberry Pi OS Lite. Additional networking hardware may be required depending on the intended Ghostlink configuration.
 - A way to type commands on the Pi (HDMI + keyboard OR SSH).
 - Your Wi-Fi names (SSIDs) and passwords.
 - A Tailscale account and ONE machine already set as an Exit Node
@@ -150,7 +155,7 @@ Why: After a reboot, we want Wi‑Fi, Tailscale, NAT, and DHCP to be ready autom
 
 Do this:
   ```
-  sudo tee /usr/local/bin/portkey-boot.sh >/dev/null <<'EOS'
+  sudo tee /usr/local/bin/ghostlink-boot.sh >/dev/null <<'EOS'
   #!/bin/bash
   set -e
   # Wait up to ~40s for Wi‑Fi to get an IP
@@ -163,23 +168,23 @@ Do this:
   [ -f /etc/iptables/rules.v4 ] && iptables-restore < /etc/iptables/rules.v4
   systemctl restart dnsmasq || true
   EOS
-  sudo chmod +x /usr/local/bin/portkey-boot.sh
+  sudo chmod +x /usr/local/bin/ghostlink-boot.sh
 
-  sudo tee /etc/systemd/system/portkey-boot.service >/dev/null <<'EOF'
+  sudo tee /etc/systemd/system/ghostlink-boot.service >/dev/null <<'EOF'
   [Unit]
-  Description=XRP-Portkey boot consolidation
+  Description=XRP-Ghostlink boot consolidation
   After=network-online.target tailscaled.service
   Wants=network-online.target
   [Service]
   Type=oneshot
-  ExecStart=/usr/local/bin/portkey-boot.sh
+  ExecStart=/usr/local/bin/ghostlink-boot.sh
   RemainAfterExit=yes
   [Install]
   WantedBy=multi-user.target
   EOF
 
   sudo systemctl daemon-reload
-  sudo systemctl enable portkey-boot.service tailscaled wpa_supplicant@wlan0 dhcpcd
+  sudo systemctl enable ghostlink-boot.service tailscaled wpa_supplicant@wlan0 dhcpcd
   ```
 
 Check it worked:
