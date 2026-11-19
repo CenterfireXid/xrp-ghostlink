@@ -1,6 +1,11 @@
-# XRP-Portkey — Verification
+# XRP-Ghostlink — Verification
 
-Use this checklist to confirm XRP‑Portkey is working after installation or any change.
+This guide provides verification procedures for XRP-Ghostlink, including Wi-Fi connectivity, Tailscale authentication, exit-node routing, optional Ethernet sharing, and persistence across reboots.
+
+Use these checks after installation or configuration changes to confirm that Ghostlink operates as intended.
+
+> [!WARNING]
+> These verification procedures describe the original installation architecture and have not been fully validated against the redesigned XRP-Ghostlink. Results should not be treated as proof of a complete or functional deployment until testing is performed.
 
 ## 1) Verify Wi‑Fi connectivity on the Pi (wlan0)
 
@@ -98,7 +103,7 @@ If not:
 
   Ensure services are enabled
   ```
-  systemctl is-enabled wpa_supplicant@wlan0 dhcpcd tailscaled portkey-boot.service
+  systemctl is-enabled wpa_supplicant@wlan0 dhcpcd tailscaled ghostlink-boot.service
   ```
 
   Reboot and re-check
@@ -124,7 +129,7 @@ Expected:
 If you implement an LED health script:
 - LED blinks 3x when exit‑node routing is OK (curl ifconfig.me matches exit node).
 - LED does a slow pulse if Wi‑Fi is down or Tailscale is offline.
-- LED off when portkey‑boot service hasn’t run yet.
+- LED off when ghostlink‑boot service hasn’t run yet.
 
 ## 7) Snapshot report (for your own records or bug reports)
 
@@ -140,4 +145,4 @@ Collect these into a text file:
 
 ## Done!
 
-If everything above checks out, XRP‑Portkey is configured correctly.
+If everything above checks out, XRP‑Ghostlink is configured correctly.
