@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# XRP-Portkey interactive installer
+# XRP-Ghostlink interactive installer
 # SPDX-License-Identifier: MIT
 
 need_root() {
@@ -50,7 +50,7 @@ print_banner() {
 cat <<'BANNER'
 
 =============================================
-     XRP-Portkey Interactive Installer
+     XRP-Ghostlink Interactive Installer
 =============================================
 This will:
  - Configure headless Wi-Fi on wlan0 (wpa_supplicant + dhcpcd)
@@ -197,7 +197,7 @@ EOF
 fi
 
 # Boot consolidation
-cat >/usr/local/bin/portkey-boot.sh <<'EOS'
+cat >/usr/local/bin/ghostlink-boot.sh <<'EOS'
 #!/usr/bin/env bash
 set -e
 for i in {1..20}; do ip -4 addr show wlan0 | grep -q 'inet ' && break; sleep 2; done
@@ -207,28 +207,28 @@ ip link set eth0 up || true
 [ -f /etc/iptables/rules.v4 ] && iptables-restore < /etc/iptables/rules.v4 || true
 systemctl restart dnsmasq 2>/dev/null || true
 EOS
-chmod +x /usr/local/bin/portkey-boot.sh
+chmod +x /usr/local/bin/ghostlink-boot.sh
 
-cat >/etc/systemd/system/portkey-boot.service <<'EOF'
+cat >/etc/systemd/system/ghostlink-boot.service <<'EOF'
 [Unit]
-Description=XRP-Portkey boot consolidation
+Description=XRP-Ghostlink boot consolidation
 After=network-online.target tailscaled.service
 Wants=network-online.target
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/portkey-boot.sh
+ExecStart=/usr/local/bin/ghostlink-boot.sh
 RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable portkey-boot.service
+systemctl enable ghostlink-boot.service
 systemctl enable tailscaled wpa_supplicant@wlan0 dhcpcd
 
 echo
 echo "============================================="
-echo "XRP-Portkey installation complete (or updated)"
+echo "XRP-Ghostlink installation complete (or updated)"
 echo "============================================="
 echo
 echo "Quick verify:"
