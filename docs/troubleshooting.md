@@ -1,7 +1,10 @@
-# XRP-Portkey — Troubleshooting Guide
+# XRP-Ghostlink — Troubleshooting Guide
 
 This guide helps diagnose common issues with Wi‑Fi, DHCP/IP assignment, Tailscale auth/exit nodes,
 Ethernet sharing (dnsmasq + iptables), DNS, and boot persistence.
+
+> [!WARNING]
+> This troubleshooting guide describes the original XRP-Ghostlink installation architecture. The procedures have not yet been validated against the redesigned installation process. Some commands modify network configuration and may interrupt remote connectivity. Do not execute these procedures until they have been reviewed and tested.
 
 ## Table of Contents
 
@@ -27,7 +30,7 @@ Services & status
   systemctl status dhcpcd
   systemctl status tailscaled
   systemctl status dnsmasq
-  journalctl -u portkey-boot.service --no-pager -n 200
+  journalctl -u ghostlink-boot.service --no-pager -n 200
   ```
 
 Networking checks  
@@ -233,22 +236,22 @@ Symptoms
 
 Checks
   ```
-  systemctl status portkey-boot.service
-  journalctl -u portkey-boot.service -n 200 --no-pager
+  systemctl status ghostlink-boot.service
+  journalctl -u ghostlink-boot.service -n 200 --no-pager
   ```
 
 Fix
 - Ensure the script is executable:
  ```
-  ls -l /usr/local/bin/portkey-boot.sh
-  sudo chmod +x /usr/local/bin/portkey-boot.sh
+  ls -l /usr/local/bin/ghostlink-boot.sh
+  sudo chmod +x /usr/local/bin/ghostlink-boot.sh
   ```
 
 - Re-enable the service:
   ```
   sudo systemctl daemon-reload
-  sudo systemctl enable portkey-boot.service
-  sudo systemctl start portkey-boot.service
+  sudo systemctl enable ghostlink-boot.service
+  sudo systemctl start ghostlink-boot.service
   ```
 - Confirm tailscaled & Wi‑Fi services are enabled:
   ```
